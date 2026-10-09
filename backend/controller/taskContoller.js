@@ -1,7 +1,7 @@
 import db from "../DB/db.js";
 
  export const readMiniTasks=(req,res)=>{
-    const query="SELECT * FROM mini_tasks order by id desc";
+    const query="SELECT * FROM tasks order by id desc";
 
     db.query(query,(err,results)=>{
         if(err){
@@ -21,7 +21,7 @@ export const CreateMiniTask=(req,res)=>{
     if(!task || !task.trim()){
         return res.status(400).json({error:"Task is required"});
     }
-    const query="INSERT INTO mini_tasks (task) VALUES (?)";
+    const query="INSERT INTO tasks (task) VALUES (?)";
     db.query(query,[task.trim()],(err,results)=>{
         if(err){
 
@@ -29,7 +29,7 @@ export const CreateMiniTask=(req,res)=>{
 
 
      }
-        CreateMiniTask(req,res);
+        readMiniTasks(req,res);
     });
 }
 
@@ -44,7 +44,7 @@ export const updateMiniTask=(req,res)=>{
         .json({error:"Task and updateId are required"});
     }
 
-    const query="UPDATE mini_tasks SET task=? WHERE id=?";
+    const query="UPDATE tasks SET task=? WHERE id=?";
 
     db.query(query,[task.trim(),updateId],(err,results)=>{
         if(err){
@@ -78,7 +78,7 @@ export const deleteTask=(req,res)=>{
         });
     }
 
-    const query="DELETE FROM mini_tasks WHERE id=?";
+    const query="DELETE FROM tasks WHERE id=?";
 
     db.query(query,[id],(err,results)=>{
         if(err){
@@ -106,7 +106,7 @@ export const completeTask=(req,res)=>{
         .json({error:"Task id is required"});
     }
 
-    const query="UPDATE mini_tasks SET completed=1 WHERE id=?";
+    const query="UPDATE tasks SET completed=1 WHERE id=?";
 
     db.query(query,[id],(err,results)=>{
         if(err){

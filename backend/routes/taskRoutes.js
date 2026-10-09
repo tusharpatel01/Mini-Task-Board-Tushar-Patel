@@ -1,5 +1,5 @@
 
-const express = require('express')
+import express from 'express'
 const router = express.Router()
 
 import {
@@ -17,4 +17,4 @@ router.post('/update-task', updateMiniTask)
 router.post('/delete-task', deleteTask)
 router.post('/complete-task', completeTask)
 
-module.exports = router
+export default router;
