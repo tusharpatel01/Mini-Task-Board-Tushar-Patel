@@ -1,29 +1,108 @@
-import React from 'react'
+
+import React, { useEffect, useState } from 'react'
+
+
+
+import {
+    getTasks,
+    addTask as createTask,
+    updateTask as editTask,
+    deleteTask as removeTask,
+    completeTask as markTaskComplete
+} from '../api/api.js'
+
+import TaskList from './TaskList.jsx'
+import TaskTabs from './TaskTabs.jsx'
+import TaskForm from './TaskForm.jsx'
 
 const Home = () => {
-  return (
-    <div className='flex flex-col justify-center items-center h-screen'>
-    <div className='text-3xl font-bold text-gray-800'   >
-        <div>MINI TASK BOARD</div>
-    </div>
+    const [tab, setTab] = useState(1)
+    const [task, setTask] = useState('')
+    const [todos, setTodos] = useState([])
+    const [isEdit, setIsEdit] = useState(false)
+    const [updateId, setUpdateId] = useState(null)
 
-    <div className='flex flex-col justify-center items-center mt-10 gap-2'>
-        <input  type="text" className='border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500' placeholder="Add a new task..." />
-        <button className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600'>Add Task</button>
-    </div>
+    useEffect(() => {
+        getTasks()
+            .then((res) => setTodos(res.data))
+            .catch((err) => console.log(err))
+    }, [])
 
-    <div className='flex gap-2 mt-4'>
-        <button className='bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600'>completed</button>
+    const handleSubmit = (e) => {
+        e.preventDefault()
 
-        <button className='bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600'>delete</button>
-        <button className='bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600'>edit</button>  
+        if (!task.trim()) {
+            return
+        }
 
-    </div>
+        const request = isEdit
+            ? editTask(updateId, task)
+            : createTask(task)
 
+        request
+            .then((res) => {
+                setTodos(res.data)
+                setTask('')
+                setIsEdit(false)
+                setUpdateId(null)
+            })
+            .catch((err) => console.log(err))
+    }
 
+    const handleEdit = (id, taskName) => {
+        setTask(taskName)
+        setUpdateId(id)
+        setIsEdit(true)
+    }
 
-    </div>
-  )
+    const handleCancel = () => {
+        setTask('')
+        setUpdateId(null)
+        setIsEdit(false)
+    }
+
+    const handleDelete = (id) => {
+        removeTask(id)
+            .then((res) => setTodos(res.data))
+            .catch((err) => console.log(err))
+    }
+
+    const handleComplete = (id) => {
+        markTaskComplete(id)
+            .then((res) => setTodos(res.data))
+            .catch((err) => console.log(err))
+    }
+
+    return (
+        <div className="bg-gray-100 min-h-screen w-full">
+            <div className="flex flex-col items-center px-4 py-12">
+                <h2 className="font-bold text-2xl mb-5">
+                    Mini Task Board
+                </h2>
+
+                <TaskForm
+                    task={task}
+                    setTask={setTask}
+                    isEdit={isEdit}
+                    onSubmit={handleSubmit}
+                    onCancel={handleCancel}
+                />
+
+                <TaskTabs
+                    tab={tab}
+                    setTab={setTab}
+                />
+
+                <TaskList
+                    todos={todos}
+                    tab={tab}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onComplete={handleComplete}
+                />
+            </div>
+        </div>
+    )
 }
 
 export default Home
