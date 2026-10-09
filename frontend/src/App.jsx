@@ -4,8 +4,7 @@ import Home from './componets/Home.jsx'
 function App() {
   return (
     <>
-      <Home
-      />
+      <Home/>
     </>
   )
 
